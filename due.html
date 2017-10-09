@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="viewport" width=600 height=600>
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+  var viewport = {x1: 0, y1: 0, x2: 100, y2:100};
+  var worldWindow   = {x1: 0, y1: 0, x2: 1000, y2:1000};
+  var canvas, graphics;
+
+  function setViewport(x1, y1, x2, y2, cname) {
+    canvas = document.getElementById(cname);
+    graphics = canvas.getContext("2d");
+    viewport = {x1: x1, y1: y1, x2: x2, y2: y2};
+  }
+
+  function setWindow(x1, y1, x2, y2) {
+    worldWindow = {x1: x1, y1: y1, x2: x2, y2: y2};
+  }
+
+  function windowToViewportTransformation(wP) {
+    var xv,yv,vP;
+    console.log(wP);
+    console.log(viewport);
+    console.log(worldWindow);
+    console.log("canvas width = " + canvas.width + " height = " + canvas.height);
+    xv = canvas.width - ((viewport.x2-viewport.x1)/(worldWindow.x2-worldWindow.x1)*(wP.x -worldWindow.x1) + viewport.x1);
+    yv = canvas.height - ((viewport.y2-viewport.y1)/(worldWindow.y2-worldWindow.y1)*(wP.y -worldWindow.y1) + viewport.y1);
+    vP = {x: xv, y: yv};
+    console.log(vP);
+    return vP;
+  }
+
+  function windowToViewportScale(w) {
+    var v;
+    v = (viewport.x2-viewport.x1)/(worldWindow.x2-worldWindow.x1)*w;
+    return v;
+  }
+
+  function translatePoint(p,T) {
+    return {x: p.x+T.x, y: p.y+T.y, z: p.z+T.z};
+  }
+
+  function scalePoint(p, s) {
+    return {x: p.x*S.x, y: p.y*S.y, z: p.z*S.z};
+  }
+
+  function vDrawLine(p1,p2) {
+    graphics.moveTo(p1.x,p1.y);
+    graphics.lineTo(p2.x,p2.y);
+    graphics.stroke();
+  }
+
+  function vDrawCircle(vP, r) {
+    graphics.beginPath();
+    graphics.arc(vP.x, vP.y, r, 0, Math.PI * 2, true);
+    graphics.stroke();
+  }
+
+  function drawCircle(wP, wR){
+    var vP = windowToViewportTransformation(wP);
+    var vR = windowToViewportScale(wR);
+    window.alert("vP = "+ vP.x +" , " + vP.y + ", r = " + vR);
+    vDrawCircle(vP,vR);
+  }
+
+  function drawLine(wP1,wP2) {
+    var vP1, vP2;
+    vP1 = windowToViewportTransformation(wP1);
+    vP2 = windowToViewportTransformation(wP2);
+    vDrawLine(vP1,vP2);
+  }
+
+  function drawOrientedSegment(wP1, wP2, wR) {
+    drawLine(wP1, wP2);
+    drawCircle(wP2,wR);
+  }
+
+  function drawRect(wP1,wP2) {
+    var vP1, vP2, vP3, vP4;
+    vP1 = windowToViewportTransformation(wP1);
+//    window.alert("vP1 = "+ vP1.x +" , " + vP1.y);
+    vP2 = windowToViewportTransformation({x: wP1.x, y: wP2.y});
+//    window.alert("vP2 = "+ vP2.x +" , " + vP2.y);
+    vP3 = windowToViewportTransformation(wP2);
+//    window.alert("vP3 = "+ vP3.x +" , " + vP3.y);
+    vP4 = windowToViewportTransformation({x: wP2.x, y: wP1.y});
+//    window.alert("vP4 = "+ vP4.x +" , " + vP4.y);
+    vDrawLine(vP1,vP2);
+    vDrawLine(vP2,vP3);
+    vDrawLine(vP3,vP4);
+    vDrawLine(vP4,vP1);
+  }
+
+  setViewport(100,100, 500,500,"viewport");
+  setWindow(-5,-5,5,5);
+  drawRect({x: -5, y: -5}, {x: 5, y: 5});
+  drawOrientedSegment({x: 0, y: -4}, {x: 0, y: 4}, 0.1);
+</script>
+
+</body>
+</html>
