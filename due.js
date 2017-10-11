@@ -85,3 +85,37 @@
   function setColor (c) {
     graphics.strokeStyle = c
   }
+
+  function vDrawArrow(fromx, fromy, tox, toy) {
+    var headlen = 10.0
+    var back = 4.0
+    var angle1 = Math.PI / 13.0
+    var angle2 = Math.atan2(toy - fromy, tox - fromx)
+    var diff1 = angle2 - angle1
+    var diff2 = angle2 + angle1
+    var xx = getBack(back, fromx, fromy, tox, toy)
+    var yy = getBack(back, fromy, fromx, toy, tox)
+
+    graphics.beginPath()
+
+    graphics.moveTo(fromx, fromy)
+    graphics.lineTo(tox, toy)
+
+    graphics.moveTo(xx, yy)
+    graphics.lineTo(xx - headlen * Math.cos(diff1), yy - headlen * Math.sin(diff1))
+
+    graphics.moveTo(xx, yy)
+    graphics.lineTo(xx - headlen * Math.cos(diff2), yy - headlen * Math.sin(diff2))
+    graphics.stroke()
+  }
+
+  function getBack(len, x1, y1, x2, y2) {
+    return x2 - (len * (x2 - x1) / (Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2))))
+  }
+
+  function drawArrow(wP1,wP2) {
+    var vP1, vP2
+    vP1 = windowToViewportTransformation(wP1)
+    vP2 = windowToViewportTransformation(wP2)
+    vDrawArrow(vP1.x, vP1.y, vP2.x, vP2.y)
+  }

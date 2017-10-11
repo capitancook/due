@@ -18,7 +18,12 @@ Your browser does not support the HTML5 canvas tag.</canvas>
   setViewport(100,100, 300,200);
   setColor("yellow");
   drawRect({x: -5, y: -5}, {x: 5, y: 5});
-  drawOrientedSegment({x: 0, y: -4}, {x: 0, y: 4}, 0.1);
+  setColor("green");
+//  drawOrientedSegment({x: 0, y: -4}, {x: 0, y: 4}, 0.1);
+  drawArrow({x: 0, y: -4}, {x: 0, y: 4});
+  setColor("black");
+  drawArrow({x: -4, y: -4}, {x: 4, y: 4});
+  drawRect({x: -2, y: -2}, {x: 2, y: 2});
 </script>
 
 </body>
