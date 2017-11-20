@@ -8,23 +8,25 @@
 Your browser does not support the HTML5 canvas tag.</canvas>
 <script src="due.js"></script>
 <script>
-
-  setWindow(-5,-5,5,5);
-
-  setViewport(0,0, 600,600);
-  setColor("red");
-  drawRect({x: -5, y: -5}, {x: 5, y: 5});
-
-  setViewport(100,100, 300,200);
-  setColor("yellow");
-  drawRect({x: -5, y: -5}, {x: 5, y: 5});
-  setColor("green");
-//  drawOrientedSegment({x: 0, y: -4}, {x: 0, y: 4}, 0.1);
-  drawArrow({x: 0, y: -4}, {x: 0, y: 4});
-  setColor("black");
-  drawArrow({x: -4, y: -4}, {x: 4, y: 4});
-  drawRect({x: -2, y: -2}, {x: 2, y: 2});
+  setWindow(-5,-5,5,5)
+  setViewport(100,100, 600,600)
+  setColor("red")
+  drawRect({x: -5, y: -5}, {x: 5, y: 5})
+  setColor("yellow")
+  drawRect({x: -5, y: -5}, {x: 5, y: 5})
+  setColor("black")
+  setLineWidth(0.2)
+  setColor('rgba(0,255,0,0.3')
+  setLineCap('round')
+  drawLine({x: 0, y: -4}, {x: 0, y: 4})
+  setLineCap('butt')
+  drawLine({x: -4, y: -4}, {x: 4, y: 4})
+  setLineCap('square')
+  drawLine({x: -4, y: 0}, {x: 4, y: 0})
+  for (var i = 10; i >= 0; i--) {
+    setFillColor('rgba(' + Math.floor(155+10*i) + ', 255,' + Math.floor(155+10*i) + ', 0.2)')
+    drawPolyline([{x: -4*i/10, y: -4*i/10},  {x: -4*i/10, y: 4*i/10}, {x: 4*i/10, y: 4*i/10}, {x: 4*i/10, y: -4*i/10}])
+  }
 </script>
-
 </body>
 </html>
