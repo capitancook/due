@@ -1,32 +1,118 @@
 <!DOCTYPE html>
 <html>
-<body>
-  <h1>
-    due.js playground
-  </h1>
-<canvas id="viewport" width=600 height=600>
-Your browser does not support the HTML5 canvas tag.</canvas>
-<script src="due.js"></script>
-<script>
-  setWindow(-5,-5,5,5)
-  setViewport(100,100, 600,600)
-  setColor("red")
-  drawRect({x: -5, y: -5}, {x: 5, y: 5})
-  setColor("yellow")
-  drawRect({x: -5, y: -5}, {x: 5, y: 5})
-  setColor("black")
-  setLineWidth(0.2)
-  setColor('rgba(0,255,0,0.3')
-  setLineCap('round')
-  drawLine({x: 0, y: -4}, {x: 0, y: 4})
-  setLineCap('butt')
-  drawLine({x: -4, y: -4}, {x: 4, y: 4})
-  setLineCap('square')
-  drawLine({x: -4, y: 0}, {x: 4, y: 0})
-  for (var i = 10; i >= 0; i--) {
-    setFillColor('rgba(' + Math.floor(155+10*i) + ', 255,' + Math.floor(155+10*i) + ', 0.2)')
-    drawPolyline([{x: -4*i/10, y: -4*i/10},  {x: -4*i/10, y: 4*i/10}, {x: 4*i/10, y: 4*i/10}, {x: 4*i/10, y: -4*i/10}])
-  }
-</script>
-</body>
+<head>
+  <style>
+    h1 {
+      text-align   : center
+    }
+    canvas {
+      width        : 600px;
+      height       : 600px;
+      border       : 1px solid;
+      border-color : #c3c3c3;"
+      padding      : 0;
+      margin       : auto;
+      display      : block;
+    }
+  </style>
+</head>
+  <body>
+    <h1>
+      due.js playground
+    </h1>
+    <canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+      Your browser does not support the HTML5 canvas tag.</canvas>
+    <script src="due.js"></script>
+    <script>
+
+// quadrante in alto a sinistra
+
+      setWindow(-5,-5,5,5)
+      setViewport(0,300, 300,600)
+      setFillStyle("rgba(0,0,255,0.2)")
+      drawFillRect({x:-5,y:-5},{x:5,y:5})
+      setFillStyle("rgba(0,0,255,0.2)")
+      drawFillRect({x:-4,y:-4},{x:4,y:4})
+      lineCap = ["round","butt", "square"]
+      setLineWidth(10)
+      for (var i = -1; i<=1; i++){
+        setLineCap(lineCap[i+1])
+        drawLine({x: i, y: -4}, {x: i, y: 4})
+      }
+
+//quadrante in alto a destra
+
+      setWindow(0,0,500,500)
+      setViewport(300,300,600,600)
+      setClipping(true)
+      setFillStyle("rgba(0,255,255,0.2)")
+      drawFillRect({x:0,y:0},{x:500,y:500})
+      setLineWidth(1)
+      var r,g,b
+      var p1,p2
+      for (var i=0;i<250;i=i+5){
+        r = i%255
+        g = 255-i%255
+        b = 255
+        setColor("rgb(" + r + "," + g + "," + b + ")" )
+        p1 = {x:100+ 100*Math.cos(i/180*Math.PI), y:200-100*Math.sin(i/180*Math.PI)}
+        p2 = {x:300+i+100*Math.cos(i/180*Math.PI), y:300+100*Math.sin(i/180*Math.PI)}
+        drawLine(p1,p2)
+      }
+
+//quadrante in basso a sinistra
+
+      setWindow(-5,-5,5,5)
+      setViewport(0,0, 300,300)
+      setLineWidth(1)
+      setColor("#000000")
+      for (var i = 10; i >= 0; i--) {
+        setColor('rgba(0,255,0,1)')
+        setFillStyle('rgba(' + Math.floor(155+10*i) + ', 255,' + Math.floor(155+10*i) + ', 0.5)')
+        drawPolyline([{x: -4*i/10, y: -4*i/10},  {x: -4*i/10, y: 4*i/10}, {x: 4*i/10, y: 4*i/10}, {x: 4*i/10, y: -4*i/10}])
+      }
+
+//quadrante in basso a destra
+
+      setWindow(0,0,10,10)
+      setViewport(300,0, 600,300)
+      var radius = 5
+      var angle  = 0
+      setFillStyle("#9966CC")
+      drawFillRect({x:0,y:0},{x:10,y:10})
+      function createStarPolyline(c,r) {
+        var ps =[]
+        var r1, center = {x:5,y:5}
+
+        for (var i = 0; i <= 9; i++) {
+          r1=r
+          if (i%2 ===1) r1 = (r / 0.525731)* 0.200811
+          ps.push(
+            {x:center.x+r1*Math.cos(2*Math.PI/10*i),
+              y:center.y+r1*Math.sin(2*Math.PI/10*i)}
+          )
+        }
+        return ps
+      }
+      function drawShape(c,ps){
+        console.log("angle = " + angle)
+        setFillStyle("#ffccff")
+        setColor("#9966CC")
+        setLineWidth(10)
+        drawFillRect({x:0,y:0},{x:10,y:10})
+        var rps = []
+        for (var i =0; i< ps.length; i++ )
+          rps.push(translatePoint(rotatePoint(translatePoint(ps[i],{x:-c.x,y:-c.y}),angle),c))
+        drawPolyline(rps)
+        angle = (angle + 1)%360
+      }
+
+      var points = createStarPolyline({x:5,y:5},4)
+
+      setInterval(drawShape,50,{x:5, y:5},points)
+
+    </script>
+    <br/>
+    <a href="out/index.html" target = "_blank">documentazione libreria due.js</a>
+  </body>
 </html>
