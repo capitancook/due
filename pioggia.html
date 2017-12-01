@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    pioggia arcobaleno con due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+
+
+  var w = 600
+  var h = 600
+  //parameters
+  var total = w
+  var accelleration = .05
+  var size = w / total
+  var occupation = w / total
+  var repaintColor = 'rgba(0, 0, 0, 0.04)'
+  var colors = []
+  var dots = []
+  var dotsVel = []
+  //setting the colors' hue
+  //and y level for all dots
+  var portion = 360 / total;
+  for (var i = 0; i < total; ++i) {
+    colors[i] = portion * i;
+    dots[i] = h;
+    dotsVel[i] = 10;
+  }
+  function anim() {
+    window.requestAnimationFrame(anim);
+    setFillStyle(repaintColor)
+    vDrawFillRect({x:0, y:0}, {x:w, y:h})
+    for (var i = 0; i < total; ++i) {
+      var currentY = dots[i] - 1;
+      dots[i] += dotsVel[i] += accelleration;
+      setFillStyle('hsl(' + colors[i] + ', 80%, 50%)')
+      vDrawFillRect({x:occupation * i, y:currentY}, {x:(size+occupation * i), y:(currentY+dotsVel[i] + 1)});
+      if (dots[i] > h && Math.random() < .01) {
+        dots[i] = dotsVel[i] = 0;
+      }
+    }
+  }
+
+  anim();
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+
