@@ -1,6 +1,6 @@
 var viewport = {x1: 0, y1: 0, x2: 100, y2: 100};
 var worldWindow = {x1: 0, y1: 0, x2: 1000, y2: 1000};
-var clippingWindow = worldWindow;
+var clippingViewport
 var clipping = false
 var graphicCanvas, graphics;
 
@@ -161,17 +161,8 @@ function getBack(len, x1, y1, x2, y2) {
  */
 function windowToViewportTransformation (wP) {
   var xv, yv, xw, yw, vP;
-
   xw = wP.x
   yw = wP.y
-  if (clipping) {
-    if (xw < clippingWindow.x1) xw =clippingWindow.x1
-    if (xw > clippingWindow.x2) xw =clippingWindow.x2
-  }
-  if (clipping) {
-    if (yw < clippingWindow.y1) yw =clippingWindow.y1
-    if (yw > clippingWindow.y2) yw =clippingWindow.y2
-  }
   xv = (xw-worldWindow.x1)/(worldWindow.x2-worldWindow.x1)*(viewport.x2-viewport.x1)+viewport.x1
   yv = graphicCanvas.height - ((yw-worldWindow.y1)/(worldWindow.y2-worldWindow.y1)*(viewport.y2-viewport.y1)+viewport.y1)
   vP = {x: xv, y: yv}
@@ -202,6 +193,15 @@ function setViewport (x1, y1, x2, y2) {
 }
 
 /**
+ * setViewportBackGroundCOlor
+ * @param {string} c - background color.
+ */
+function setViewportBackgroundColor(c){
+  setFillStyle(c)
+  drawFillRect({x:worldWindow.x1, y:worldWindow.y1},{x:worldWindow.x2, y:worldWindow.y2})
+}
+
+/**
  * setWindow set the window of the real world in world coordinates
  * @param {number} x1 - abscissa of the lower left corner in world coordinates.
  * @param {number} y1 - ordinate of the lower left corner in world coordinates.
@@ -210,7 +210,6 @@ function setViewport (x1, y1, x2, y2) {
  */
 function setWindow (x1, y1, x2, y2) {
   worldWindow = {x1: x1, y1: y1, x2: x2, y2: y2}
-  clippingWindow = worldWindow
 }
 
 /**
@@ -239,7 +238,7 @@ function getWindowHeigth () {
  * @param {number} y2 - ordinate of the upper right corner in world coordinates.
  */
 function setClippingWindow (x1, y1, x2, y2) {
-  clippingWindow = {x1: x1, y1: y1, x2: x2, y2: y2}
+  clippingViewport = {x1: x1, y1: y1, x2: x2, y2: y2}
 }
 
 /**
@@ -248,6 +247,7 @@ function setClippingWindow (x1, y1, x2, y2) {
  */
 function setClipping (c) {
   clipping = !!c
+
 }
 
 /**
@@ -402,4 +402,15 @@ function drawPolyline (wPs) {
 
 function drawStar(wP,r) {
   vDrawStar(windowToViewportTransformation(wP),windowToViewportScale(r))
+}
+
+var mouse = { //make a globally available object with x,y attributes
+  x: 0,
+  y: 0
+}
+graphicCanvas.onmousemove = function (event) { // this  object refers to canvas object
+  mouse = {
+    x: event.pageX - this.offsetLeft,
+    y: event.pageY - this.offsetTop
+  }
 }

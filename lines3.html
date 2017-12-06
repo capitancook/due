@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    L I N E S versione 3  by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+  var dx = 0
+  var forwardx = true
+  var dy = 0
+  var forwardy = true
+  function draw(height,width) {
+    setViewportBackgroundColor("lightgray")
+    for (var i = 0; i <= 600; i += 20) {
+      setColor("red")
+      drawLine({x:i, y:0},      {x:dx, y:height - i})
+      setColor("green")
+      drawLine({x:i, y:height}, {x:dx, y:i})
+      if (dx == width) forwardx = false
+      if (dx == 0) forwardx = true
+      if (forwardx) dx = dx +1
+      else dx = dx -1
+
+      setColor("blue")
+      drawLine({x:0, y:height - i}, {x:width- i, y:dy})
+      setColor("yellow")
+      drawLine({x:width, y:height - i}, {x:i, y:dy})
+      if (dy >= height) forwardy = false
+      if (dy <= 0) forwardy = true
+      if (forwardy) dy = dy + 1
+      else dy = dy - 1
+
+    }
+  }
+
+  setWindow(0,0,600,600)
+  setViewport(0,0,600,600)
+  setInterval(draw, 100, 600,600)
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+
