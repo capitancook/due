@@ -43,12 +43,12 @@
 //using the y value of y i made two sets of lines that are connected at the y value of the mouse
 // by making two sets the curves can be moved from the top to the bottom of the canvas
       setColor("rgb(0, 128, 0)")
-      drawLine({x:0, y:i},     {x:width - i, y:mouse.y})
-      drawLine({x:width, y:i}, {x:i, y:mouse.y})
+      drawLine({x:0, y:i},     {x:width - i, y:height-mouse.y})
+      drawLine({x:width, y:i}, {x:i, y:height-mouse.y})
 
       setColor("rgb(128, 128, 0)")
-      drawLine({x:0, y:height - i}, {x:width- i, y:mouse.y})
-      drawLine({x:width, y:height - i}, {x:i, y:mouse.y})
+      drawLine({x:0, y:height - i}, {x:width- i, y:height-mouse.y})
+      drawLine({x:width, y:height - i}, {x:i, y:height-mouse.y})
 
     }
   }

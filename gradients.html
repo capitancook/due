@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    G R A D I E N T S  versione 1  by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+
+  function draw(height,width) {
+    setViewportBackgroundColor("lightgray")
+    var g = createLinearGradientColor({x:-10,y:0},{x:10,y:0},[{stop:0,color:"red"},{stop:0.5,color:"green"},{stop:1,color:"blue"}])
+    setColor(g)
+    setLineWidth(10)
+    drawLine({x:-10,y:0},{x:10,y:0})
+    setColor("gray")
+    setLineWidth(1)
+    drawFillRect({x:-5,y:0.5},{x:-1,y:4.5},g)
+    setColor("gray")
+    setLineWidth(1)
+    g = createRadialGradientColor({x:5,y:5},0.2,{x:5,y:5},5,
+                                      [{stop:0,color:"yellow"},{stop:0.5,color:"orange"},{stop:1,color:"violet"}])
+    setFillStyle(g)
+    drawCircle({x:5,y:5},5)
+
+    g = createRadialGradientColor({x:0,y:-5},0.2,{x:0,y:-5},5,
+      [{stop:0,color:"white"},{stop:1,color:"gold"}])
+    setFillStyle(g)
+    drawStar({x:0,y:-5},5)
+
+//    var grad = createLinearGradientColor({x:-5,y:0},{x:5,y:0},[{stop:0,color:"red"},{stop:1,color:"white"}])
+//    drawFillRect({x:-5,y:0},{x:5,y:0},grad)
+  }
+
+  setWindow(-10,-10,10,10)
+  setViewport(0,0,600,600)
+  draw(600,600)
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+

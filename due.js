@@ -1,3 +1,4 @@
+//------------------------------------GLOBAL VARIABLES------------------------------------------------------------------
 var viewport = {x1: 0, y1: 0, x2: 100, y2: 100};
 var worldWindow = {x1: 0, y1: 0, x2: 1000, y2: 1000};
 var clippingViewport
@@ -7,7 +8,40 @@ var graphicCanvas, graphics;
 graphicCanvas = document.getElementById('viewport');
 graphics = graphicCanvas.getContext('2d');
 
-//------------------------------------DRIVER START-----------------------------------------------------------------------
+var mouse = { //make a globally available object with x,y attributes
+  x: 0,
+  y: 0
+}
+var wmouse = { //make a globally available object with x,y attributes
+  x: 0,
+  y: 0
+}
+
+graphicCanvas.onmousemove = function (event) { // this  object refers to canvas object
+  mouse = {
+    x: event.pageX - this.offsetLeft,
+    y: event.pageY - this.offsetTop
+  }
+  wmouse = viewportToWindowTransformation(mouse)
+}
+
+//------------------------------------UTILITY FUNCTIONS-----------------------------------------------------------------
+function lerp(a, b, t) {
+// var A = [1,2,3]
+// var B = [2,5,6]
+//
+// var X = lerp(A, B, 0.01)
+
+  var len = a.length
+  if(b.length != len) return
+
+  var x = []
+  for(var i = 0; i < len; i++)
+    x.push(a[i] + t * (b[i] - a[i]))
+  return x
+}
+
+//------------------------------------DRIVER START----------------------------------------------------------------------
 
 
 /**
@@ -84,6 +118,7 @@ function vDrawPolyline (vPoints) {
 function vDrawCircle (vP, r) {
   graphics.beginPath();
   graphics.arc(vP.x, vP.y, r, 0, Math.PI * 2, true);
+  graphics.fill()
   graphics.stroke()
 }
 
@@ -153,6 +188,42 @@ function getBack(len, x1, y1, x2, y2) {
   return x2 - (len * (x2 - x1) / (Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2))))
 }
 
+/**
+ * vCreateLinearGradientColor sets the style used when filling shapes with a gradient color (viewport coordinates)
+ * Also, check out {@link https://www.w3schools.com/tags/canvas_createlineargradient.asp|W3School} and
+ *{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient|Mozilla}
+ * @private
+ * @param {object} sP - starting point of the gradient in viewport coordinates .
+ * @param {object} eP - ending point of the gradient in viewport coordinates .
+ * @param {array} colorStops -	an array of objects {stop:stop, color:color} containing the color stops of the gradient.
+ */
+function vCreateLinearGradientColor (sP,eP,colorStops) {
+  var g=graphics.createLinearGradient(sP.x,sP.y,eP.x,eP.y)
+  for (var i = 0;i<colorStops.length;i++){
+    g.addColorStop(colorStops[i]["stop"],colorStops[i]["color"])
+  }
+  return g
+}
+
+/**
+ * vCreateRadialGradientColor sets the style used when filling shapes with a radial gradient color (viewport coordinates)
+ * Also, check out {@link https://www.w3schools.com/tags/canvas_createlineargradient.asp|W3School} and
+ *{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient|Mozilla}
+ * @private
+ * @param {object} sP - center of the starting circle of the gradient in viewport coordinates .
+ * @param {number} r1 - radius of the starting circle of the gradient in viewport coordinates .
+ * @param {object} eP - center of the ending circle of the gradient in viewport coordinates .
+ * @param {number} r2 - radius of the ending circle of the gradient in viewport coordinates .
+ * @param {array} colorStops -	an array of objects {stop:stop, color:color} containing the color stops of the gradient.
+ */
+function vCreateRadialGradientColor (sP,r1,eP,r2,colorStops) {
+  var g=graphics.createRadialGradient(sP.x,sP.y,r1,eP.x,eP.y,r2)
+  for (var i = 0;i<colorStops.length;i++){
+    g.addColorStop(colorStops[i]["stop"],colorStops[i]["color"])
+  }
+  return g
+}
+
 //------------------------------------DRIVER END-----------------------------------------------------------------------
 
 /**
@@ -165,6 +236,20 @@ function windowToViewportTransformation (wP) {
   yw = wP.y
   xv = (xw-worldWindow.x1)/(worldWindow.x2-worldWindow.x1)*(viewport.x2-viewport.x1)+viewport.x1
   yv = graphicCanvas.height - ((yw-worldWindow.y1)/(worldWindow.y2-worldWindow.y1)*(viewport.y2-viewport.y1)+viewport.y1)
+  vP = {x: xv, y: yv}
+  return vP
+}
+
+/**
+ * viewportToWindowTransformation transforms a point in viewport  coordinate in a point in world coordinate
+ * @param {object} vP - a point in world coordinate.
+ */
+function viewportToWindowTransformation (vP) {
+  var xv, yv, xw, yw, wP;
+  xv = vP.x
+  yv = vP.y
+  xw = (xv-viewport.x1)/(viewport.x2-viewport.x1)*(worldWindow.x2-worldWindow.x1)+worldWindow.x1
+  yw = ((yv-viewport.y1)/(viewport.y2-viewport.y1)*(worldWindow.y2-worldWindow.y1)+worldWindow.y1)
   vP = {x: xv, y: yv}
   return vP
 }
@@ -247,7 +332,6 @@ function setClippingWindow (x1, y1, x2, y2) {
  */
 function setClipping (c) {
   clipping = !!c
-
 }
 
 /**
@@ -297,6 +381,35 @@ function setColor (c) {
  */
 function setFillStyle (s) {
   graphics.fillStyle = s
+}
+
+/**
+ * createLinearGradientColor sets the style used when filling shapes with a gradient color (world coordinates)
+ * Also, check out {@link https://www.w3schools.com/tags/canvas_createlineargradient.asp|W3School} and
+ *{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient|Mozilla}
+ * @param {object} sP - starting point of the gradient in world coordinates .
+ * @param {object} eP - ending point of the gradient in world coordinates .
+ * @param {array} colorStops -	an array containing the color stops of the gradient.
+ */
+function createLinearGradientColor (sP,eP,colorStops) {
+  return vCreateLinearGradientColor(windowToViewportTransformation(sP),
+                                    windowToViewportTransformation(eP), colorStops)
+}
+
+/**
+ * createRadialGradientColor sets the style used when filling shapes with a radial radial color (world coordinates)
+ * Also, check out {@link https://www.w3schools.com/tags/canvas_createlineargradient.asp|W3School} and
+ *{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient|Mozilla}
+ * @param {object} sP - center of the starting circle of the gradient in world coordinates .
+ * @param {number} r1 - radius of the starting circle of the gradient in world coordinates .
+ * @param {object} eP - center of the ending circle of the gradient in world coordinates .
+ * @param {number} r2 - radius of the ending circle of the gradient in world coordinates .
+ * @param {array} colorStops -	an array of objects {stop:stop, color:color} containing the color stops of the gradient.
+ */
+function createRadialGradientColor (sP,r1,eP,r2,colorStops) {
+  return vCreateRadialGradientColor(windowToViewportTransformation(sP),windowToViewportScale(r1),
+                                    windowToViewportTransformation(eP), windowToViewportScale(r2),
+                                    colorStops)
 }
 
 /**
@@ -400,17 +513,12 @@ function drawPolyline (wPs) {
   }
 }
 
+/**
+ * drawStar draws  an eventually filled five pointed starpolyline whose points are stored in the point's array wPs
+ * @param {object} wP - center point of the star in world coordinates.
+ * @param {number} wP - radius of the star in world coordinates.
+ */
 function drawStar(wP,r) {
   vDrawStar(windowToViewportTransformation(wP),windowToViewportScale(r))
 }
 
-var mouse = { //make a globally available object with x,y attributes
-  x: 0,
-  y: 0
-}
-graphicCanvas.onmousemove = function (event) { // this  object refers to canvas object
-  mouse = {
-    x: event.pageX - this.offsetLeft,
-    y: event.pageY - this.offsetTop
-  }
-}
