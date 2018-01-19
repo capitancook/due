@@ -35,7 +35,7 @@
   setFillStyle("rgba(0,0,255,0.2)")
   drawFillRect({x: -4, y: -4}, {x: 4, y: 4})
   lineCap = ["round", "butt", "square"]
-  setLineWidth(10)
+  setLineWidth(0.1)
   for (var i = -1; i <= 1; i++) {
     setLineCap(lineCap[i + 1])
     drawLine({x: i, y: -4}, {x: i, y: 4})
@@ -48,7 +48,7 @@
   setClipping(true)
   setFillStyle("rgba(0,255,255,0.2)")
   drawFillRect({x: 0, y: 0}, {x: 500, y: 500})
-  setLineWidth(1)
+  setLineWidth(0.2)
   var p1, p2
   for (var i = 0; i < 250; i = i + 2) {
     setColor('hsl(' + i + ', 100%, 50%)')
@@ -61,7 +61,7 @@
 
   setWindow(-5, -5, 5, 5)
   setViewport(0, 0, 300, 300)
-  setLineWidth(1)
+  setLineWidth(0.1)
   for (var i = 10; i >= 0; i--) {
     setColor('rgba(' + Math.floor(155 + 10 * i) + ', 255,' + Math.floor(255 - 10 * i) + ', 0.5)')
     setFillStyle('rgba(' + Math.floor(155 + 10 * i) + ', 255,' + Math.floor(255 - 10 * i) + ', 0.5)')
@@ -101,7 +101,7 @@
     setFillStyle("#ffccff")
     setColor('hsl(' + angle % 255 + ', 80%, 50%)')
 //        setColor("rgb(200,150,240)")
-    setLineWidth(10)
+    setLineWidth(0.2)
     drawFillRect({x: 0, y: 0}, {x: 10, y: 10})
     var rps = []
     for (var i = 0; i < ps.length; i++)

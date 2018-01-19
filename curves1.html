@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    C U R V E S ver 1 by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+
+  var lines = []
+  var cycle = 9
+
+  setViewport(0,0,600,300)
+  setViewportBackgroundColor("lightGray")
+  var viewportWidth = viewport.x2-viewport.x1
+  var viewportHeight = viewport.y2-viewport.y1
+
+  setColor("rgb(255,255,255)")
+  setFillStyle("rgba(0,0,0,0.01)")
+
+  createLines();
+
+  function createLines() {
+    lines = [];
+    for (var i = 0; i < 2; i++) {
+      newLine();
+    }
+  }
+
+  function newLine() {
+    lines.push({
+      sp:{x: viewportWidth/2, y: viewportHeight},
+      cp1:{x: viewportWidth/2-Math.random()*viewportWidth/2, y:viewportHeight/2-Math.random()*viewportHeight/2},
+      cp2:{x: viewportWidth-Math.random()*viewportWidth, y:viewportHeight-Math.random()*viewportHeight},
+      ep:{x: viewportWidth-Math.random()*viewportWidth, y: -viewportHeight/2},
+      rotation: Math.random() * 360,
+      angle1: Math.random() * 10,
+      angle2: Math.random() * 10,
+      angle3: Math.random() * 10
+    })
+  }
+
+  function colorCycle() {
+    cycle += .1;
+    if (cycle > 360) {
+      cycle = 0;
+    }
+    var r = Math.floor(Math.sin(.3 * cycle + 0) * 127 + 128),
+      g = Math.floor(Math.sin(.3 * cycle + 2) * 127 + 128),
+      b = Math.floor(Math.sin(.3 * cycle + 4) * 127 + 128),
+      a = Math.random() * 1,
+      c = Math.floor(Math.random()*cycle);
+//     return "hsla(" + c + ", 100%, 70%, 0.1 )";
+    return "rgba(" + r + "," + g + "," + b + "," + 0.1 + ")";
+  }
+
+  function render() {
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i]
+      setColor(colorCycle())
+      line.cp1.x += Math.sin(line.angle1 += 0.005);
+      line.cp1.y += Math.sin(line.angle1);
+
+      line.cp2.y -= Math.sin(line.angle2 -= 0.005);
+      line.cp2.x -= Math.sin(line.angle2);
+
+      line.sp.x -= Math.sin(line.angle3 += 0.005);
+      line.sp.y -= Math.sin(line.angle3);
+
+      line.ep.x -= Math.sin(line.angle3 += 0.005);
+      line.ep.y -= Math.sin(line.angle3);
+      vDrawBezier(line.sp,line.cp1,line.cp2,line.ep)
+    }
+    requestAnimationFrame(render);
+  }
+
+  render();
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+

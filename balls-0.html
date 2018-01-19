@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    B A L L S  versione 0  by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+  setWindow(0,0,400,400)
+  setViewport(0,0,600,600)
+  width= worldWindow.x2-worldWindow.x1
+  height = worldWindow.y2-worldWindow.y1
+
+  function random(min, max) {
+    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return num;
+  }
+
+  function Ball(x,y, velX, velY, color, size) {
+    this.x = x
+    this.y = y
+    this.velX = velX
+    this.velY = velY
+    this.color = color
+    this.size = size
+    this.draw = function() {
+      setFillStyle(this.color)
+      setColor(this.color)
+      drawCircle({x:this.x, y:this.y}, this.size)
+    }
+    this.update = function() {
+
+      this.x += this.velX;
+      this.y += this.velY;
+    }
+  }
+  var balls = [];
+
+  function createBalls(){
+    for (var i = 0; i < 20; i++) {
+      var ball = new Ball(
+        random(0,width),
+        random(0,height),
+        random(-3,3),
+        random(-3,3),
+        'rgba(' + random(0,255) + ',' + random(0,255) + ',' + random(0,255) +',0.2)',
+        random(10,20)
+      );
+      balls.push(ball);
+    }
+  }
+
+  function loop() {
+    setViewportBackgroundColor('rgba(0, 0, 0, 0.25)')
+      for (var i = 0; i < balls.length; i++) {
+      balls[i].draw();
+      balls[i].update();
+    }
+    requestAnimationFrame(loop);
+  }
+  createBalls()
+  loop()
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    T R A C K S  versione 0  by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+  setWindow(0,0,400,400)
+  setViewport(0,0,600,600)
+  var width= worldWindow.x2-worldWindow.x1
+  var height = worldWindow.y2-worldWindow.y1
+  var timer
+  setOnMouseDown(show)
+
+  function random(min, max) {
+    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return num;
+  }
+
+  function Ball(x,y, velX, velY, color, size) {
+    this.x = x
+    this.y = y
+    this.velX = velX
+    this.velY = velY
+    this.color = color
+    this.size = size
+    this.draw = function() {
+      setFillStyle("rgba(0,0,0,0.02)")
+      setLineWidth(1)
+      setColor(this.color)
+      drawCircle({x:this.x, y:this.y}, this.size)
+      // se l'ascissa del centro della palla più la dimensione della palla è maggiore o uguale alla larghezza allora
+      // inverte la velocità lungo l'asse x (="rimbalza" sul bordo a destra)
+      if ((this.x + this.size) >= width) {
+        this.velX = -(this.velX);
+      }
+      // se l'ascissa del centro della palla meno la dimensione della palla è minore o uguale a 0 allora inverte
+      // la velocità lungo l'asse x (="rimbalza" sul bordo a sinistra)
+      if ((this.x - this.size) <= 0) {
+        this.velX = -(this.velX);
+      }
+      // se l'ordinata del centro della palla più la dimensione della palla è maggiore o uguale alla altezza allora
+      // inverte la velocità lungo l'asse y (="rimbalza" sul bordo in alto)
+      if ((this.y + this.size) >= height) {
+        this.velY = -(this.velY);
+      }
+      // se l'ordinata del centro della palla meno la dimensione della palla è minore o uguale a 0  allora inverte
+      // la velocità lungo l'asse y (="rimbalza" sul bordo in basso)
+      if ((this.y - this.size) <= 0) {
+        this.velY = -(this.velY);
+      }
+      // incrementa ascissa e ordinata del centro delle quantità velX e VelY rispettivamente.
+
+      this.x += this.velX;
+      this.y += this.velY;
+      setLineWidth(2)
+      setColor("rgba(0,0,0,0.22)")
+      drawCircle({x:this.x, y:this.y}, this.size)
+    }
+  }
+  var balls = []
+
+  function createBalls(){
+    for (var i = 0; i < 30; i++) {
+      var ball = new Ball(
+        random(0,width),
+        random(0,height),
+        random(-2,2),
+        random(-2,2),
+        this.color = '#' + (Math.random() * 0x404040 + 0xaaaaaa | 0).toString(16),
+        random(10,20)
+      );
+      balls.push(ball);
+    }
+  }
+
+  function loop() {
+    for (var i = 0; i < balls.length; i++) {
+      balls[i].draw();
+//      balls[i].update();
+    }
+  }
+
+  function show(){
+    balls = []
+    setViewportBackgroundColor('rgba(0, 0, 0, 1)')
+    createBalls()
+    if(timer)
+      clearInterval(timer)
+    timer = setInterval(loop,1000/60)
+  }
+
+
+
+  show()
+
+
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+

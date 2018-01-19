@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    B A L L S  versione 2  by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+  setWindow(0,0,400,400)
+  setViewport(0,0,600,600)
+  width= worldWindow.x2-worldWindow.x1
+  height = worldWindow.y2-worldWindow.y1
+
+  function random(min, max) {
+    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return num;
+  }
+
+  function Ball() {
+    this.centerX = width/2
+    this.centerY = height/2
+    this.radius = width/5 + random(0, width/10)
+    this.angle = random(0,360)
+    this.x = this.centerX+this.radius*Math.cos(Math.PI/180*this.angle)
+    this.y = this.centerY+this.radius*Math.sin(Math.PI/180*this.angle)
+    this.vel = random(-2,2) + 0.5
+    this.color = '#' + (Math.random() * 0x404040 + 0xaaaaaa | 0).toString(16)
+    this.size = width/200
+    this.draw = function () {
+      setFillStyle(this.color)
+      setColor(this.color)
+      drawCircle({x: this.x, y: this.y}, this.size)
+    }
+    this.update = function () {
+      var mouse = getMousePosition()
+      drawText({x: 10, y: 10}, "x = " + mouse.x + ", y = " + mouse.y)
+      this.x = this.centerX+this.radius*Math.cos(Math.PI/180*this.angle)
+      this.y = this.centerY+this.radius*Math.sin(Math.PI/180*this.angle)
+      this.angle = (this.angle + this.vel) % 360
+    }
+  }
+  var balls = [];
+
+  function createBalls(){
+    for (var i = 0; i < 20; i++) {
+      var ball = new Ball()
+      balls.push(ball)
+    }
+  }
+
+  function loop() {
+    setViewportBackgroundColor('rgba(0, 0, 0, 0.5)')
+    for (var i = 0; i < balls.length; i++) {
+      balls[i].draw();
+      balls[i].update();
+    }
+    requestAnimationFrame(loop);
+  }
+  createBalls()
+  loop()
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+

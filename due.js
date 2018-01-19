@@ -8,21 +8,20 @@ var graphicCanvas, graphics;
 graphicCanvas = document.getElementById('viewport');
 graphics = graphicCanvas.getContext('2d');
 
-var mouse = { //make a globally available object with x,y attributes
+var viewportMouse = { //make a globally available object with x,y attributes
   x: 0,
   y: 0
 }
-var wmouse = { //make a globally available object with x,y attributes
+var windowMouse = { //make a globally available mouse coordinate point object with x,y in world coordinate
   x: 0,
   y: 0
 }
 
 graphicCanvas.onmousemove = function (event) { // this  object refers to canvas object
-  mouse = {
+  viewportMouse = {
     x: event.pageX - this.offsetLeft,
     y: event.pageY - this.offsetTop
   }
-  wmouse = viewportToWindowTransformation(mouse)
 }
 
 //------------------------------------UTILITY FUNCTIONS-----------------------------------------------------------------
@@ -41,7 +40,97 @@ function lerp(a, b, t) {
   return x
 }
 
+//------------------------------------GRAPHICS OBJECTS DEFINITION-------------------------------------------------------
+function Point(x, y) {
+  this.x = parseFloat(x)
+  this.y = parseFloat(y)
+}
+
+function Triangle(p1, p2, p3) {
+  this.p1 = p1
+  this.p2 = p2
+  this.p3 = p3
+}
+
+function Square(center, side) {
+  // Generate the vertices
+  var d = side / 2
+  this.vertices = [
+    new Point(center.x - d, center.y - d),
+    new Point(center.x + d, center.y - d),
+    new Point(center.x + d, center.y + d),
+    new Point(center.x - d, center.y + d)]
+}
+
+function Triangle(p1, p2, p3) {
+  // Generate the vertices
+  this.vertices = [
+    new Point(p1.x, p1.y),
+    new Point(p2.x, p2.y),
+    new Point(p3.x, p3.y)]
+}
+
+function Rectangle(p1, p2, p3, p4) {
+  // Generate the vertices
+  this.vertices = [
+    new Point(p1.x, p1.y),
+    new Point(p2.x, p2.y),
+    new Point(p3.x, p3.y),
+    new Point(p4.x, p4.y)]
+}
+
+//https://en.wikipedia.org/wiki/Regular_polygon
+function RegularPolygon(center, radius, nSides){
+  // Generate the vertices
+  var i = 0;
+  this.vertices = []
+  for (i=0;1<nSides;i++){
+    this.vertices.push({x:center.x + radius*Math.cos(2*Math.PI/nSides*i),
+                        y:center.y + radius*Math.sin(2*Math.PI/nSides*i)})
+  }
+}
+
 //------------------------------------DRIVER START----------------------------------------------------------------------
+/**
+ * vSetLineWidth set the line width
+ * * @param {number} vlw - the line width in viewport coordinates
+ * Also, check out {@link https://www.w3schools.com/tags/canvas_linewidth.asp|W3School} and
+ *{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineWidth|Mozilla}
+ */
+function vSetLineWidth (vlw) {
+  graphics.lineWidth = vlw
+}
+
+
+
+/**
+ * vGetMousePosition is a viewport function that returns a point object containing the mouse position in viewport
+ * coordinates
+ * @private
+ */
+function vGetMousePosition (){
+  return viewportMouse
+}
+/**
+ * setOnMouseDown sets the event handler function for the canvas onmousedown event to f. In practice, sets the function that will
+ * be called when someone press the mouse button
+ * @param {object} f - the event handler function for the canvas onmousedown event
+ */
+function setOnMouseDown(f){
+  graphicCanvas.onmousedown = f
+}
+
+/**
+ * vDrawPoint is a viewport function used to draw a point in vP in viewport coordinates
+ * @private
+ * @param {object} vP - point in viewport coordinates.
+ */
+function vDrawPoint (vP) {
+  graphics.beginPath();
+  graphics.moveTo(vP.x-1, vP.y-1);
+  graphics.lineTo(vP.x, vP.y);
+  graphics.stroke()
+}
 
 
 /**
@@ -107,6 +196,23 @@ function vDrawPolyline (vPoints) {
     graphics.stroke();
     graphics.fill()
   }
+}
+
+/**
+ * vDrawBezier is a viewport function used to draw a bezier curve with starting point sp, first control point cp1
+ * second control point cp2 and ending point ep
+ * @private
+ * @param {Object[]} sp - starting point  in viewport coordinates.
+ * @param {Object[]} cp1 - first control point  in viewport coordinates.
+ * @param {Object[]} cp2 - second control point  in viewport coordinates.
+ * @param {Object[]} ep - ending  point  in viewport coordinates.
+ */
+function vDrawBezier (sp,cp1,cp2,ep) {
+    graphics.beginPath()
+    graphics.moveTo(sp.x, sp.y)
+    graphics.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, ep.x, ep.y);
+    graphics.closePath()
+    graphics.stroke()
 }
 
 /**
@@ -224,7 +330,27 @@ function vCreateRadialGradientColor (sP,r1,eP,r2,colorStops) {
   return g
 }
 
+
+/**
+ * vDrawImage draws the imag image with its left-top corner in vdp (viewport coordinates)
+ * Also, check out {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage|Mozilla}
+ * @private
+ * @param {object} vdp - the image's left-top corner in  viewport coordinates .
+ * @param {object} image - the image to be drawn .
+ */
+function vDrawImage(vdp,image) {
+  graphics.drawImage(image,vdp.x,vdp.y)
+}
 //------------------------------------DRIVER END-----------------------------------------------------------------------
+
+/**
+ * getMousePosition  returns a point object containing the mouse position in world coordinates
+ */
+function getMousePosition (){
+  windowMouse = viewportToWindowTransformation(viewportMouse)
+  return windowMouse
+}
+
 
 /**
  * windowToViewportTransformation transforms a point in world coordinate in a point in viewport coordinate
@@ -242,16 +368,16 @@ function windowToViewportTransformation (wP) {
 
 /**
  * viewportToWindowTransformation transforms a point in viewport  coordinate in a point in world coordinate
- * @param {object} vP - a point in world coordinate.
+ * @param {object} vP - a point in viewport coordinate.
  */
 function viewportToWindowTransformation (vP) {
   var xv, yv, xw, yw, wP;
   xv = vP.x
   yv = vP.y
   xw = (xv-viewport.x1)/(viewport.x2-viewport.x1)*(worldWindow.x2-worldWindow.x1)+worldWindow.x1
-  yw = ((yv-viewport.y1)/(viewport.y2-viewport.y1)*(worldWindow.y2-worldWindow.y1)+worldWindow.y1)
-  vP = {x: xv, y: yv}
-  return vP
+  yw = worldWindow.y2-((yv-viewport.y1)/(viewport.y2-viewport.y1)*(worldWindow.y2-worldWindow.y1)+worldWindow.y1)
+  wP = {x: xw, y: yw}
+  return wP
 }
 
 /**
@@ -264,7 +390,6 @@ function windowToViewportScale (w) {
   v = (viewport.x2 - viewport.x1) / (worldWindow.x2 - worldWindow.x1) * w;
   return v
 }
-
 
 /**
   * setViewport set the viewport destination for the graphics commands
@@ -283,7 +408,7 @@ function setViewport (x1, y1, x2, y2) {
  */
 function setViewportBackgroundColor(c){
   setFillStyle(c)
-  drawFillRect({x:worldWindow.x1, y:worldWindow.y1},{x:worldWindow.x2, y:worldWindow.y2})
+  vDrawFillRect({x:viewport.x1, y:viewport.y1},{x:viewport.x2, y:viewport.y2})
 }
 
 /**
@@ -313,7 +438,6 @@ function getWindowWidth () {
 function getWindowHeigth () {
   return worldWindow.y2-worldWindow.y1
 }
-
 
 /**
  * setClippingWindow set the clipping window on the real world in world coordinates
@@ -358,8 +482,10 @@ function scalePoint (p, s) {
  * @param {object} r - rotation angle in degrees.
  */
 function rotatePoint (p, r) {
-  var xr = Math.cos((2*Math.PI/360)*r) * p.x - Math.sin((2*Math.PI/360)*r) * p.y
-  var yr = Math.sin((2*Math.PI/360)*r) * p.x + Math.cos((2*Math.PI/360)*r) * p.y
+  var s = Math.sin((Math.PI/180)*r)
+  var c = Math.cos((Math.PI/180)*r)
+  var xr = c * p.x - s * p.y
+  var yr = s * p.x + c * p.y
   return {x: xr, y: yr}
 }
 
@@ -424,12 +550,13 @@ function setLineCap (c) {
 
 /**
  * setLineWidth set the line width
- * * @param {number} lw - the line cap ={"butt","round","square"}
+ * * @param {number} lw - the line width in world coordinates
  * Also, check out {@link https://www.w3schools.com/tags/canvas_linewidth.asp|W3School} and
  *{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineWidth|Mozilla}
  */
 function setLineWidth (lw) {
-  graphics.lineWidth = lw
+  var vlw = windowToViewportScale(lw)
+  vSetLineWidth(vlw)
 }
 
 function drawArrow(wP1,wP2) {
@@ -438,6 +565,16 @@ function drawArrow(wP1,wP2) {
   vP2 = windowToViewportTransformation(wP2);
   vDrawArrow(vP1.x, vP1.y, vP2.x, vP2.y)
 }
+
+/**
+ * drawPoint is a function used to draw a point in vP in world coordinates
+ * @private
+ * @param {object} wP - point in world coordinates.
+ */
+function drawPoint (vP) {
+  vDrawPoint(windowToViewportTransformation(vP))
+}
+
 
 /**
  * drawLine draws a line from point vP1 to point vP2 in world coordinates
@@ -522,3 +659,70 @@ function drawStar(wP,r) {
   vDrawStar(windowToViewportTransformation(wP),windowToViewportScale(r))
 }
 
+/**
+ * drawText is a function used to draw a circle whose center is in vP1 and radius is r
+ * @param {object} wP - point representing the position of the text to be drawn in world coordinates.
+ * @param {string} s - string containing the text to be drawn.
+ */
+function drawText (wP, s) {
+  var vP = windowToViewportTransformation(wP)
+  vDrawText(vP,s);
+}
+
+/**
+ * drawOutlinedText is a function used to draw a circle whose center is in vP1 and radius is r
+ * @param {object} wP - point representing the position of the text to be drawn in world coordinates.
+ * @param {string} s - string containing the text to be drawn.
+ */
+function drawOutlinedText (wP, s) {
+  var vP = windowToViewportTransformation(wP)
+  vDrawOutlinedText(vP,s);
+}
+
+/**
+ * setTextFont sets the font and size for the next text to be drawn
+ * @param {string} f - string containing the font size and name like '48px verdana'.
+  * Also, check out {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font|Mozilla}
+ */
+function setTextFont(f) {
+  graphics.font = f
+}
+
+/**
+ * setTextAlignment sets the font and size for the next text to be drawn
+ * @param {string} a - string containing the alignment style  Possible values:
+ * start, end, left, right or center. The default value is start.
+ * Also, check out {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign|Mozilla}
+ */
+function setTextAlignment(a) {
+  graphics.textAlign = a
+}
+
+
+/**
+ * drawImage draws the imag image with its left-top corner in vdp (world coordinates)
+ * Also, check out {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage|Mozilla}
+ * @param {object} wdp - the image's left-top corner in  world coordinates .
+ * @param {object} image - the image to be drawn .
+ */
+function drawImage(wdp,image) {
+  var vdp = windowToViewportTransformation(wdp)
+  vDrawImage(vdp,image)
+}
+
+
+/**
+ * drawBezier draws a bezier curve with starting point sp, first control point cp1
+ * second control point cp2 and ending point ep
+ * @param {Object[]} sp - starting point  in world coordinates.
+ * @param {Object[]} cp1 - first control point  in world coordinates.
+ * @param {Object[]} cp2 - second control point  in world coordinates.
+ * @param {Object[]} ep - ending  point  in world coordinates.
+ */
+function drawBezier (sp,cp1,cp2,ep) {
+  var vsp = windowToViewportTransformation(sp)
+  var vcp1 = windowToViewportTransformation(cp1)
+  var vcp2 = windowToViewportTransformation(cp2)
+  var vep = windowToViewportTransformation(ep)
+  vDrawBezier(vsp,vcp1,vcp2,vep)
+}

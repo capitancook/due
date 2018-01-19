@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    N O I S E  versione 0  by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+  var width= 600
+  var height = 600
+  var timer
+//  setOnMouseDown(show)
+
+  function random(min, max) {
+    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return num;
+  }
+  function showWaves() {
+    vDrawFillRect({x:0,y:0},{x:width,y:height},'rgba(0, 0, 0, 0, 0.1)')
+    for (var j = 0; j <height-10; j=j+10) {
+      showWave(j, height/10,j%10)
+    }
+  }
+
+  function showWave(y,h,a) {
+    var ox = 0,oy =y
+    var c = random(0,100)
+    setColor('hsla('+ y % 360 + ',100%,50%,0.5)')
+    graphics.lineWidth = 10
+    var r = random(0,5)
+    for (var i = 0; i <width-5; i=i+5) {
+      vDrawLine({x:i,y:oy+r+h*Math.sin(2*Math.PI/width*10*(i+a))},{x:i+5,y:oy+r+h*Math.sin(2*Math.PI/width*10*(i+5+a))})
+      }
+    }
+
+  function show(){
+    setFillStyle('red')
+    vDrawFillRect({x:0,y:0},{x:width,y:height})
+    if(timer)
+      clearInterval(timer)
+    timer = setInterval(showWaves,1000/60)
+  }
+
+  show()
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center
+        }
+
+        canvas {
+            width: 600px;
+            height: 600px;
+            border: 1px solid;
+            border-color: #c3c3c3;
+            padding: 0;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    L I N E S ver 4 by due.js
+</h1>
+<canvas id="viewport" width=600 height=600 style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+<script src="due.js"></script>
+<script>
+  var rad = 0.1
+  var spd = 20
+  var particles = []
+  var maxParticles = 20
+  var timer
+  var colorArr = ['#EC008B', '#A42B39', '#40bbff', '#86d300', '#F6893E', '#CE118C', '#FFF100', '#ED1847', '#44270d'];
+
+  setViewport(0,0,600,600)
+  var viewportWidth = viewport.x2-viewport.x1
+  var viewportHeight = viewport.y2-viewport.y1
+  setOnMouseDown(show)
+
+  function createParticles(w,h) {
+    for (var i = 0; i < maxParticles; i++) {
+      var particle = {};
+      particle.x = Math.floor(Math.random() * w);
+      particle.y = Math.floor(Math.random() * h);
+      // itm.color = colorArr[Math.floor(Math.random() * colorArr.length)]
+      //keeps colors in order
+      particle.color = colorArr[i % colorArr.length]
+      particles.push(particle);
+    }
+  }
+
+  function draw() {
+    for (var i = 0; i < particles.length; i++) {
+      setFillStyle(particles[i].color)
+      setColor(particles[i].color)
+      vSetLineWidth(0.1)
+
+      vDrawCircle(particles[i],rad)
+      if (i < particles.length - 1) {
+        vDrawLine(particles[i],particles[i+1])
+      } else {
+        vDrawLine(particles[i],particles[0])
+      }
+    }
+  }
+
+  function update() {
+    var obj,tgt;
+    for (var i = 0; i < particles.length; i++) {
+      obj = particles[i];
+      if (i < particles.length - 1) {
+        tgt = particles[i + 1]
+      } else {
+        tgt = particles[0];
+      }
+      //each particle try to reach the next particle
+      obj.x += (tgt.x - obj.x) / spd;
+      obj.y += (tgt.y - obj.y) / spd;
+    }
+    draw()
+  }
+
+  function show(){
+    particles = []
+    setViewportBackgroundColor('lightGray')
+    createParticles(viewportWidth, viewportHeight)
+    for (var t = 0; t < 1000; t++)[
+      update()
+    ]
+//    if(timer)
+//      clearInterval(timer)
+//    timer = setInterval(update,1000/60)
+  }
+
+
+show()
+
+
+</script>
+<br/>
+<a href="out/index.html" target="_blank">documentazione libreria due.js</a>
+</body>
+</html>
+
